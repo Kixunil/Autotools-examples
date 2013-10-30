@@ -1,0 +1,26 @@
+CC=@CC@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+BINDIR=@bindir@
+LDFLAGS=@LDFLAGS@
+CFLAGS=@CFLAGS@
+CFLAGS+=-W -Wall
+
+all: helloworld
+
+clean:
+	rm -f *.o helloworld
+
+distclean: clean
+	rm -rf Makefile config.h config.status config.log autom4te.cache
+
+install:
+	install -Dm 755 helloworld $(BINDIR)/helloworld
+
+helloworld: main.o hello.o
+	$(CC) $(LDFLAGS) -o $@ $^
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+.PHONY: all clean distclean install

@@ -1,0 +1,47 @@
+CC=@CC@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+BINDIR=@bindir@
+LDFLAGS=@LDFLAGS@
+CFLAGS=@CFLAGS@
+CFLAGS+=-W -Wall
+HOST=@host_alias@
+WITH_GTK=@with_gtk@
+GTK_CFLAGS=@GTK_CFLAGS@
+GTK_LIBS=@GTK_LIBS@
+DEFS+=-DOPERATING_SYSTEM=\"$(OS_NAME)\"
+
+ifeq ($(findstring -linux-,$(HOST)),-linux-) # Linux
+	BINEXTENSION=
+	OS_NAME=Linux
+endif
+
+ifeq ($(findstring -mingw32,$(HOST)),-mingw32) # Windows
+	BINEXTENSION=.exe
+	OS_NAME=Windows
+endif
+
+ifeq ($(WITH_GTK),yes)
+	HELLOWORLDDEPS=gtkdialog.o
+endif
+
+OS_NAME?=unknown_operating_system
+
+all: helloworld$(BINEXTENSION)
+
+clean:
+	rm -f *.o helloworld$(BINEXTENSION)
+
+distclean: clean
+	rm -rf Makefile config.h config.status config.log autom4te.cache
+
+install:
+	install -Dm 755 helloworld$(BINEXTENSION) $(BINDIR)/helloworld
+
+helloworld$(BINEXTENSION): main.o hello.o os_detect.o $(HELLOWORLDDEPS)
+	$(CC) $(LDFLAGS) -o $@ $^ $(GTK_LIBS)
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(DEFS) $(GTK_CFLAGS) -c -o $@ $<
+
+.PHONY: all clean distclean install

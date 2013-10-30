@@ -1,0 +1,17 @@
+CFLAGS=-W -Wall
+
+all: helloworld
+
+clean:
+	rm -f *.o helloworld
+
+distclean: clean
+	rm -rf Makefile config.h config.status config.log autom4te.cache
+
+helloworld: main.o hello.o
+	$(CC) $(LDFLAGS) -o $@ $^
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
+
+.PHONY: all clean distclean

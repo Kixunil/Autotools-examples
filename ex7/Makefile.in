@@ -1,0 +1,40 @@
+CC=@CC@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+BINDIR=@bindir@
+LDFLAGS=@LDFLAGS@
+CFLAGS=@CFLAGS@
+CFLAGS+=-W -Wall
+HOST=@host_alias@
+DEFS+=-DOPERATING_SYSTEM=\"$(OS_NAME)\"
+
+ifeq ($(findstring -linux-,$(HOST)),-linux-) # Linux
+	BINEXTENSION=
+	OS_NAME=Linux
+endif
+
+ifeq ($(findstring -mingw32,$(HOST)),-mingw32) # Windows
+	BINEXTENSION=.exe
+	OS_NAME=Windows
+endif
+
+OS_NAME?=unknown_operating_system
+
+all: helloworld$(BINEXTENSION)
+
+clean:
+	rm -f *.o helloworld$(BINEXTENSION)
+
+distclean: clean
+	rm -rf Makefile config.h config.status config.log autom4te.cache
+
+install:
+	install -Dm 755 helloworld$(BINEXTENSION) $(BINDIR)/helloworld
+
+helloworld$(BINEXTENSION): main.o hello.o os_detect.o
+	$(CC) $(LDFLAGS) -o $@ $^
+
+%.o: %.c
+	$(CC) $(CFLAGS) $(DEFS) -c -o $@ $<
+
+.PHONY: all clean distclean install
