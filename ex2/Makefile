@@ -1,4 +1,5 @@
 CFLAGS=-W -Wall
+# Assignment also works with a space before '='
 
 helloworld: main.o hello.o
 	$(CC) $(LDFLAGS) -o helloworld main.o hello.o
